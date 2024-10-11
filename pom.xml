@@ -1,0 +1,49 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.example</groupId>
+    <artifactId>prueba</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name><!-- Change this comment for the name application --></name>
+    <description><!-- ${date} Change this comment for the description application --></description>
+
+    <!-- INFORMACION PARENT -->
+    <parent>
+        <groupId>com.banregio.next.v2.core</groupId>
+        <artifactId>base</artifactId>
+        <version>3.6.2-SNAPSHOT</version>
+        <relativePath />
+    </parent>
+
+    <dependencies>
+        <!-- DEPENDENCIAS NEXT -->
+        <dependency>
+        	<groupId>com.banregio.next.v2.core</groupId>
+            <artifactId>ms-lib</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>com.banregio.next.v2.core</groupId>
+            <artifactId>postgres-lib</artifactId>
+        </dependency>
+        <!-- DEPENDENCIAS SPRING -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- DEPENDENCIAS UTILES -->
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

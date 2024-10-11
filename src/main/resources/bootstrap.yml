@@ -1,0 +1,281 @@
+server:
+  port: 8081
+  tomcat:
+    accept-count: 500 #longitud máxima de la cola para las solicitudes de conexión entrantes.
+    max-connections: 10000 #número máximo de conexiones que el servidor acepta y procesa en un momento dado
+    threads:
+      max: 2000
+      min-spare: 25  
+    max-threads: 2000 # Número máximo de solicitudes simultáneas que se pueden manejar
+    min-spare-threads: 25 #el número mínimo de subprocesos mantenidos en ejecución. hilos activos como los inactivos
+  error:
+    include-message: always
+  servlet:
+    encoding:
+      force: true
+management:
+  health:
+    probes:
+      enabled: true
+    defaults:
+      enabled: false
+  endpoints:
+    health:
+      probes: 
+        enabled: true
+    web:
+      exposure:
+        include: '*'
+health:
+  config:
+    enabled: false
+hystrix:
+  threadpool:
+    default:
+      allowMaximumSizeToDivergeFromCoreSize: true
+      maximumSize: 200
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 120000
+        timeout:
+          enabled: false
+ribbon:
+  ReadTimeout: 300000
+  ConnectTimeout: 300000
+  MaxAutoRetries: 0
+  MaxAutoRetriesNextServer: 0
+  OkToRetryOnAllOperations: false
+  eureka:
+    enabled: false
+feign:
+  okhttp:
+    enabled: true
+
+spring:
+  application:
+    name: prueba
+  boot:
+    admin:
+#Para sb-admin
+      auto-deregistration: true
+      register-once: false
+      api-path: instances
+      url: http://sb-admin.neco.svc.cluster.local:8080
+      client:
+        prefer-ip: true
+        management-base-url: http://${spring.cloud.client.ipAddress}:${server.port}/
+        service-base-url: http://${spring.application.name}.${OPENSHIFT_BUILD_NAMESPACE:localhost}.svc.cluster.local:${server.port}/
+        health-url: http://${spring.cloud.client.ipAddress}:${server.port}/health
+        metadata:
+          version: ${spring.application.parent.version}
+          namespace: ${OPENSHIFT_BUILD_NAMESPACE:localhost}
+          hostname: ${HOSTNAME:localhost}
+#Para next-admin
+        auto-deregistration: true
+        register-once: false
+        api-path: instances
+        url:
+        - http://next-admin.neco.svc.cluster.local:8080/admin
+        instance:
+          prefer-ip: true
+          management-base-url: http://${spring.cloud.client.ip-address}:${server.port}/
+          service-base-url: http://${spring.application.name}.${OPENSHIFT_BUILD_NAMESPACE:localhost}.svc.cluster.local:${server.port}/
+          metadata:
+            version: ${spring.application.parent.version}
+            namespace: ${OPENSHIFT_BUILD_NAMESPACE:localhost}
+            hostname: ${HOSTNAME:localhost}
+
+  cloud:
+    config:
+      server:
+        health:
+          enabled: false
+      uri: http://configserver.neco.svc.cluster.local:8080
+      username: '{cipher}ed39c328599e09f64ccbc91b89819f0e3daf7c1b06f8d42eee03a3c8b0695526'
+      password: '{cipher}68796665b6c12d9edbeb4ce4923d44875a64cee0601bd459a366986164f0df8f'
+      label: develop
+      profile: ${OPENSHIFT_BUILD_NAMESPACE:default}
+  rabbitmq:
+    host: rabbitmq.neut.svc.cluster.local
+    port: 5672
+    username: '{cipher}3b819a5956fa6b52b9f90fd841d8eaeba8f552256468c068ec5292684d116833'
+    password: '{cipher}0701017e38c54683fe97c5c73b684975c0f967a7d5b6e1610df4ff51f0799cf9'
+  redis:
+    host: redis-10000.brmdredis.banregio.com
+    port: 10000
+    pool:
+      max-idle: 8
+      min-idle: 0
+      max-active: 1000
+      max-wait: -1
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 0
+        max-active: 1000
+        max-wait: -1
+  zipkin:
+    service:
+      name: ${OPENSHIFT_BUILD_NAMESPACE:localhost}-${spring.application.name}
+    sender:
+      type: kafka
+  sleuth:
+    sampler:
+      percentage: 1
+      probability: 1
+  kafka:
+    bootstrap-servers: kafka-1.neut.svc:9092
+  data:
+    redis:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+
+logging:
+  file:
+    name: logs/${OPENSHIFT_BUILD_NAMESPACE:localhost}/${spring.application.name}.log
+  level:
+    root: WARN
+    com.banregio.sibamex: INFO
+    com.banregio.next: INFO
+    com.netflix.discovery: 'OFF'
+    org.springframework.amqp: 'OFF'
+    org.springframework.cloud.config.client: 'OFF'
+    org.springframework.cloud.sleuth.instrument.web.TraceFilter: 'OFF'
+    org.apache.catalina.core: 'OFF'
+    org.apache.kafka.clients: 'OFF'
+    io.undertow.request: 'OFF'
+    org.eclipse.jetty.server.HttpChannel: 'OFF'
+    org.hibernate.SQL: 'OFF'
+    org.hibernate.type.descriptor.sql.BasicBinder: 'OFF'
+
+seguridad:
+  ribbon:
+    listOfServers: http://seguridad.neco.svc.cluster.local:8080
+  uri: seguridad
+
+next:
+  transition: true
+  developer-mode: true
+  security:
+    jwt:
+      secret: AQUI_VA_LA LLAVE_PARA_ENCRIPTAR_TOKENS_Y_PASSWORDS
+    encrypt:
+      key: ${ENCRYPT_KEY:default}
+      algorithm: "PBEWithMD5AndTripleDES"
+  loggin:
+    sybase: true
+  folio:
+    algoritmo: SHA-256
+    appname: ${spring.application.name}
+    proceso: ${random.int[20,50]}
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      javax.persistence.create-database-schemas: true
+      org:
+        hibernate:
+          envers:
+            default_schema: auditor
+            store_data_at_delete: true
+            global_with_modified_flag: true
+            audit_strategy: org.hibernate.envers.strategy.ValidityAuditStrategy
+  datasource:
+    tomcat:
+      driver-class-name: org.postgresql.Driver
+      test-on-borrow: true
+      validation-query: SELECT 1
+      validation-interval: 10000
+      time-between-eviction-runs-millis: 10000
+      test-while-idle: true
+      remove-abandoned: true
+      remove-abandoned-timeout: 30
+      initial-size: 1
+      max-active: 20
+      max-idle: 3
+      min-idle: 1
+      db-properties:
+        ApplicationName: ${OPENSHIFT_BUILD_NAMESPACE:localhost}-${spring.application.name}
+
+#Para futuras versiones del core      
+#  kafka:
+#    bootstrap-servers: brmdocpapp01.banregio.com:30092
+
+sb3:
+  sybase:
+    use-custom-metadata: true
+    datasource:
+      tomcat:
+        url: jdbc:sybase:Tds:BRMDSYBNEXT:5000/BANREGIO
+        driver-class-name: com.sybase.jdbc42.jdbc.SybDriver
+        test-on-borrow: true
+        validation-query: SELECT 1
+        validation-interval: 10000
+        time-between-eviction-runs-millis: 10000
+        test-while-idle: true
+        remove-abandoned: true
+        remove-abandoned-timeout: 30
+        initial-size: 1
+        max-active: 20
+        max-idle: 10
+        min-idle: 3
+        min-evictable-idle-time-millis: 900000
+        db-properties:
+          SERVER_INITIATED_TRANSACTIONS: 'false'
+          APPLICATIONNAME: ${OPENSHIFT_BUILD_NAMESPACE:localhost}-${spring.application.name}
+          USE_METADATA: 'false'
+          
+  reports:
+    use-custom-metadata: true
+    datasource:
+      tomcat:
+        url: jdbc:sybase:Tds:BRMDSYBNEXT:5000/BANREGIO
+        driver-class-name: com.sybase.jdbc42.jdbc.SybDriver
+        test-on-borrow: true
+        validation-query: SELECT 1
+        validation-interval: 10000
+        time-between-eviction-runs-millis: 10000
+        test-while-idle: true
+        remove-abandoned: true
+        remove-abandoned-timeout: 30
+        initial-size: 1
+        max-active: 20
+        max-idle: 10
+        min-idle: 3
+        min-evictable-idle-time-millis: 900000
+        db-properties:
+          SERVER_INITIATED_TRANSACTIONS: 'false'
+          APPLICATIONNAME: ${OPENSHIFT_BUILD_NAMESPACE:localhost}-${spring.application.name}
+
+  metadata:
+    datasource:
+      tomcat:
+        url: jdbc:postgresql://brmdnextsup.banregio.com:5432/NEXTCOREBR
+        username: BRMDNEXTCORE
+        password: 8FJngNaBMk35j4AneyaH
+        driver-class-name: org.postgresql.Driver
+        test-on-borrow: true
+        validation-query: SELECT 1
+        validation-interval: 10000
+        time-between-eviction-runs-millis: 10000
+        test-while-idle: true
+        remove-abandoned: true
+        remove-abandoned-timeout: 30
+        initial-size: 1
+        max-active: 20
+        max-idle: 3
+        min-idle: 1
+        db-properties:
+          ApplicationName: ${OPENSHIFT_BUILD_NAMESPACE:localhost}-${spring.application.name}
+          USE_METADATA: 'false'
+encrypt:
+  key: default

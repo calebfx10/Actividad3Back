@@ -1,0 +1,20 @@
+#Estas configuraciones se agregan dependiendo de los servicios remotos que se utilizarán
+next:
+  entities-audit:
+# Propiedad para activar entities de auditoria https://next.banregio.com/docs/backend/kraken/auditoria-entidades
+    enable: false
+  datasource:
+    tomcat:
+      url: jdbc:postgresql://localhost:5432/caleb.gamiz #Se requiere crear la BD
+      username: 'postgres'
+      password: 'postgres'
+
+sibamex-soporte:
+  ribbon:
+    listOfServers: https://sibamex-soporte-nesib.brmdocp.banregio.com:443/
+  uri: sibamex-soporte
+  
+venta:
+ ribbon:
+   listOfServers: http://localhost:8080/
+ uri: venta
